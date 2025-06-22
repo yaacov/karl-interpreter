@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: 'go.mod'
+        
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+          
+    - name: Download dependencies
+      run: make deps
+      
+    - name: Run tests
+      run: make test
+      
+    - name: Build static binary
+      run: make build-static
+      
+    - name: Generate SHA signature
+      run: make sha256
+      
+    - name: Get release info
+      id: release_info
+      run: |
+        echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        echo "release_name=$(echo ${GITHUB_REF#refs/tags/} | sed 's/^v//')" >> $GITHUB_OUTPUT
+        
+    - name: Upload binary to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./bin/karl-linux-amd64
+        asset_name: karl-linux-amd64
+        asset_content_type: application/octet-stream
+        
+    - name: Upload SHA256 to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./bin/karl-linux-amd64.sha256
+        asset_name: karl-linux-amd64.sha256
+        asset_content_type: text/plain
