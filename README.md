@@ -1,8 +1,7 @@
 # KARL - Kubernetes Affinity Rule Language
 
+[![GoDoc](https://godoc.org/github.com/yaacov/karl-interpreter?status.svg)](https://godoc.org/github.com/yaacov/karl-interpreter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yaacov/karl-interpreter)](https://goreportcard.com/report/github.com/yaacov/karl-interpreter)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.24-blue)](https://golang.org/)
 
 KARL (Kubernetes Affinity Rule Language) is a human-readable domain-specific language for expressing Kubernetes pod affinity and anti-affinity rules. It simplifies the complex YAML syntax into intuitive, English-like statements.
 
